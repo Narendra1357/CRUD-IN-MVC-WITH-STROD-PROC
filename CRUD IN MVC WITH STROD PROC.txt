@@ -1,0 +1,866 @@
+
+-------------------------------------------------------------------
+              MVC FRAMEWORK CRUD
+============================================================================
+------------------------- MVC CONTROLLER
+=========================================================================
+using Error12.DataBase2;
+using Error12.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace Error12.Controllers
+{
+    [RoutePrefix("Narndra")]
+    public class HomeController : Controller
+    {
+        public ActionResult Index()
+        {
+            return View();
+        }
+
+        public ActionResult  About()
+        {
+             Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+            //First Approch....
+            var result = dbconnn.GetDataFromT().ToList();
+
+            //Second Approch...
+           // var result = dbconnn.Database.SqlQuery<EmpModel>("exec GetAllData").ToList();
+             return View(result);
+        }
+
+        public ActionResult Contact()
+        {
+            ViewBag.Message = "Your contact page.";
+
+            return View();
+        }
+        [Route("App")]
+        public ActionResult Dasbord()
+        {
+            //Second Approch...
+            Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+          // var result = dbconnn.Database.SqlQuery<EmpModel>("exec GetAllData").ToList();
+
+            //Third aApproch...
+            var result = dbconnn.Database.SqlQuery<EmpModel>("GetAllData").ToList();
+            return View(result); 
+        }
+        [HttpGet]
+        public ActionResult RegistrationForm()
+        {
+
+            return View();
+        }
+        [HttpPost]
+        public ActionResult RegistrationForm(EmpModel obj)
+        {
+            Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+            dbconnn.InsertValuetable(obj.Id, obj.Village, obj.Dist, obj.State, obj.PinCode, obj.EmpId,
+                   obj.DName, obj.DCode, obj.EName, obj.Email, obj.Password, obj.MobileNo);
+            dbconnn.SaveChanges();
+           // if (obj.EdId == 0)
+           // {
+           //     dbconnn.EditItem(obj.Id, obj.Village, obj.Dist, obj.State, obj.PinCode,
+           //obj.DName, obj.DCode, obj.EName, obj.Email, obj.Password, obj.MobileNo);
+           //     dbconnn.SaveChanges();
+           // }
+           // else
+           // {
+           //     dbconnn.InsertValuetable(obj.Id, obj.Village, obj.Dist, obj.State, obj.PinCode, obj.EmpId,
+           //         obj.DName, obj.DCode, obj.EName, obj.Email, obj.Password, obj.MobileNo);
+           //     dbconnn.SaveChanges();
+           //}
+            return RedirectToAction("Dasbord");
+            
+        }
+        [HttpGet]
+        public ActionResult Login()
+        {
+
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Login(EmpModel obj)
+        {
+            Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+            var update = dbconnn.GetDataWithEmail(obj.Email,obj.Password).First();
+            EmpModel upres = new EmpModel();
+            upres.Id = update.Id;
+            upres.EName = update.EName;
+            upres.Email = update.Email;
+            upres.Password = update.Password;
+            upres.MobileNo = update.MobileNo;
+            upres.Village = update.Village;
+            upres.Dist = update.Dist;
+            upres.State = update.State;
+            upres.PinCode = update.PinCode;
+            upres.DName = update.DName;
+            upres.DCode = update.DCode;
+            return View("Contact", upres);
+            
+        }
+         
+        public ActionResult Edit(int Id,int EdId)
+        {
+            Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+            var update = dbconnn.GetAllDataWithId(@Id=Id).First();
+            EmpModel upres = new EmpModel();
+            upres.Id = update.Id;
+            upres.EName = update.EName;
+            upres.Email = update.Email;
+            upres.Password = update.Password;
+            upres.MobileNo = update.MobileNo;
+            upres.Village = update.Village;
+            upres.Dist = update.Dist;
+            upres.State = update.State;
+            upres.PinCode = update.PinCode;
+            upres.DName = update.DName;
+            upres.DCode = update.DCode;
+            return  View("RegistrationForm",upres);
+        }
+        [HttpGet]
+        public ActionResult UpdatData(int Id)
+        {
+            Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+            var update = dbconnn.GetAllDataWithId(Id).ToList();
+
+            return View(update[0]);
+             
+        }
+        [HttpPost]
+        public ActionResult UpdatData(EmpModel obj )
+        {
+            Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+            dbconnn.EditItem(obj.Id, obj.Village, obj.Dist, obj.State, obj.PinCode,
+        obj.DName, obj.DCode, obj.EName, obj.Email, obj.Password, obj.MobileNo);
+            dbconnn.SaveChanges();
+            return RedirectToAction("Dasbord");
+        }
+        public ActionResult Delete(int Id)
+        {
+            Stord_ProcedureEntities1 dbconnn = new Stord_ProcedureEntities1();
+            dbconnn.DeleteData(Id);
+            dbconnn.SaveChanges();
+            return RedirectToAction("Dasbord");
+        }
+    }
+}
+=======================================================
+------------------------- MVC  DATABASE CONNECTION
+=========================================================================
+
+//------------------------------------------------------------------------------
+// <auto-generated>
+//     This code was generated from a template.
+//
+//     Manual changes to this file may cause unexpected behavior in your application.
+//     Manual changes to this file will be overwritten if the code is regenerated.
+// </auto-generated>
+//------------------------------------------------------------------------------
+
+namespace Error12.DataBase2
+{
+    using System;
+    using System.Data.Entity;
+    using System.Data.Entity.Infrastructure;
+    using System.Data.Entity.Core.Objects;
+    using System.Linq;
+    
+    public partial class Stord_ProcedureEntities1 : DbContext
+    {
+        public Stord_ProcedureEntities1()
+            : base("name=Stord_ProcedureEntities1")
+        {
+        }
+    
+        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        {
+            throw new UnintentionalCodeFirstException();
+        }
+    
+    
+        public virtual ObjectResult<GetDataFromT_Result> GetDataFromT()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDataFromT_Result>("GetDataFromT");
+        }
+    
+        public virtual int InsertValuetable(Nullable<int> id, string village, string dist, string state, string pinCode, Nullable<int> empId, string dName, string dCode, string eName, string email, string password, string mobileNo)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(int));
+    
+            var villageParameter = village != null ?
+                new ObjectParameter("Village", village) :
+                new ObjectParameter("Village", typeof(string));
+    
+            var distParameter = dist != null ?
+                new ObjectParameter("Dist", dist) :
+                new ObjectParameter("Dist", typeof(string));
+    
+            var stateParameter = state != null ?
+                new ObjectParameter("State", state) :
+                new ObjectParameter("State", typeof(string));
+    
+            var pinCodeParameter = pinCode != null ?
+                new ObjectParameter("PinCode", pinCode) :
+                new ObjectParameter("PinCode", typeof(string));
+    
+            var empIdParameter = empId.HasValue ?
+                new ObjectParameter("EmpId", empId) :
+                new ObjectParameter("EmpId", typeof(int));
+    
+            var dNameParameter = dName != null ?
+                new ObjectParameter("DName", dName) :
+                new ObjectParameter("DName", typeof(string));
+    
+            var dCodeParameter = dCode != null ?
+                new ObjectParameter("DCode", dCode) :
+                new ObjectParameter("DCode", typeof(string));
+    
+            var eNameParameter = eName != null ?
+                new ObjectParameter("EName", eName) :
+                new ObjectParameter("EName", typeof(string));
+    
+            var emailParameter = email != null ?
+                new ObjectParameter("Email", email) :
+                new ObjectParameter("Email", typeof(string));
+    
+            var passwordParameter = password != null ?
+                new ObjectParameter("Password", password) :
+                new ObjectParameter("Password", typeof(string));
+    
+            var mobileNoParameter = mobileNo != null ?
+                new ObjectParameter("MobileNo", mobileNo) :
+                new ObjectParameter("MobileNo", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("InsertValuetable", idParameter, villageParameter, distParameter, stateParameter, pinCodeParameter, empIdParameter, dNameParameter, dCodeParameter, eNameParameter, emailParameter, passwordParameter, mobileNoParameter);
+        }
+    
+        public virtual int sp_alterdiagram(string diagramname, Nullable<int> owner_id, Nullable<int> version, byte[] definition)
+        {
+            var diagramnameParameter = diagramname != null ?
+                new ObjectParameter("diagramname", diagramname) :
+                new ObjectParameter("diagramname", typeof(string));
+    
+            var owner_idParameter = owner_id.HasValue ?
+                new ObjectParameter("owner_id", owner_id) :
+                new ObjectParameter("owner_id", typeof(int));
+    
+            var versionParameter = version.HasValue ?
+                new ObjectParameter("version", version) :
+                new ObjectParameter("version", typeof(int));
+    
+            var definitionParameter = definition != null ?
+                new ObjectParameter("definition", definition) :
+                new ObjectParameter("definition", typeof(byte[]));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("sp_alterdiagram", diagramnameParameter, owner_idParameter, versionParameter, definitionParameter);
+        }
+    
+        public virtual ObjectResult<GetAllData_Result> GetAllData()
+        {
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAllData_Result>("GetAllData");
+        }
+    
+        public virtual int DeleteData(Nullable<int> id)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("DeleteData", idParameter);
+        }
+    
+        public virtual int EditItem(Nullable<int> id, string village, string dist, string state, string pinCode, string dName, string dCode, string eName, string email, string password, string mobileNo)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(int));
+    
+            var villageParameter = village != null ?
+                new ObjectParameter("Village", village) :
+                new ObjectParameter("Village", typeof(string));
+    
+            var distParameter = dist != null ?
+                new ObjectParameter("Dist", dist) :
+                new ObjectParameter("Dist", typeof(string));
+    
+            var stateParameter = state != null ?
+                new ObjectParameter("State", state) :
+                new ObjectParameter("State", typeof(string));
+    
+            var pinCodeParameter = pinCode != null ?
+                new ObjectParameter("PinCode", pinCode) :
+                new ObjectParameter("PinCode", typeof(string));
+    
+            var dNameParameter = dName != null ?
+                new ObjectParameter("DName", dName) :
+                new ObjectParameter("DName", typeof(string));
+    
+            var dCodeParameter = dCode != null ?
+                new ObjectParameter("DCode", dCode) :
+                new ObjectParameter("DCode", typeof(string));
+    
+            var eNameParameter = eName != null ?
+                new ObjectParameter("EName", eName) :
+                new ObjectParameter("EName", typeof(string));
+    
+            var emailParameter = email != null ?
+                new ObjectParameter("Email", email) :
+                new ObjectParameter("Email", typeof(string));
+    
+            var passwordParameter = password != null ?
+                new ObjectParameter("Password", password) :
+                new ObjectParameter("Password", typeof(string));
+    
+            var mobileNoParameter = mobileNo != null ?
+                new ObjectParameter("MobileNo", mobileNo) :
+                new ObjectParameter("MobileNo", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction("EditItem", idParameter, villageParameter, distParameter, stateParameter, pinCodeParameter, dNameParameter, dCodeParameter, eNameParameter, emailParameter, passwordParameter, mobileNoParameter);
+        }
+    
+        public virtual ObjectResult<GetAllDataWithId_Result> GetAllDataWithId(Nullable<int> id)
+        {
+            var idParameter = id.HasValue ?
+                new ObjectParameter("Id", id) :
+                new ObjectParameter("Id", typeof(int));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetAllDataWithId_Result>("GetAllDataWithId", idParameter);
+        }
+    
+        public virtual ObjectResult<GetDataWithEmail_Result> GetDataWithEmail(string email, string password)
+        {
+            var emailParameter = email != null ?
+                new ObjectParameter("Email", email) :
+                new ObjectParameter("Email", typeof(string));
+    
+            var passwordParameter = password != null ?
+                new ObjectParameter("Password", password) :
+                new ObjectParameter("Password", typeof(string));
+    
+            return ((IObjectContextAdapter)this).ObjectContext.ExecuteFunction<GetDataWithEmail_Result>("GetDataWithEmail", emailParameter, passwordParameter);
+        }
+    }
+}
+
+=======================================================
+------------------------- MVC MODELS
+=========================================================================
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+
+namespace Error12.Models
+{
+    public class Field
+    {
+        public List<EmpModel> AvailableField { get; set; }
+    }
+    public class EmpModel
+    {
+        
+        public  int? Id { get; set; }
+        public  int  EdId { get; set; }
+        public string EName { get; set; }
+        public string Email { get; set; }
+        public string Password { get; set; }
+        public string MobileNo { get; set; }
+        public string Village { get; set; }
+        public string Dist { get; set; }
+        public string State { get; set; }
+        public string PinCode { get; set; }
+        public int? EmpId { get; set; }
+        public string DName { get; set; }
+        public string DCode { get; set; }
+     
+    }
+}
+
+
+=======================================================
+------------------------- MVC VIEWS
+=========================================================================
+----------------------> REGISTRATION
+
+@model Error12.Models.EmpModel
+@{
+    ViewBag.Title = "RegistrationForm";
+}
+
+<h2>RegistrationForm</h2>
+<div>
+
+    @using (Html.BeginForm("RegistrationForm", "Home", FormMethod.Post))
+    {
+
+        <div class="form-group">
+            <label>Id</label>
+            @Html.TextBoxFor(m => m.Id, new { @class = "form-control" })
+        </div>
+        @*<div class="form-group">
+                <label>Enter any no. for Registration</label><br />
+                <label>If you want to Update then forget it... </label>
+                @Html.TextBoxFor(m => m.EdId, new { @class = "form-control" })
+            </div>*@
+        <div class="form-group">
+            <label>Name</label>
+            @Html.TextBoxFor(m => m.EName, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Password</label>
+            @Html.TextBoxFor(m => m.Password, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Mobile</label>
+            @Html.TextBoxFor(m => m.MobileNo, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Village</label>
+            @Html.TextBoxFor(m => m.Village, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>District</label>
+            @Html.TextBoxFor(m => m.Dist, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>State</label>
+            @Html.TextBoxFor(m => m.State, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>PinCode</label>
+            @Html.TextBoxFor(m => m.PinCode, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>Dpartment</label>
+            @Html.TextBoxFor(m => m.DName, new { @class = "form-control" })
+        </div>
+        <div class="form-group">
+            <label>DCode</label>
+            @Html.TextBoxFor(m => m.DCode, new { @class = "form-control" })
+
+        </div>
+        <button class="btn btn-primary" type="submit">Submit</button>
+
+        <button class="btn btn-danger" type="reset">Reset</button>
+
+    }
+</div>
+ 
+=========================================================================
+---------------------->DASBOARD
+
+@model List<Error12.Models.EmpModel>
+@{
+    ViewBag.Title = "Dasbord";
+   
+}
+
+<h2>Dasbord</h2>
+
+<h1>Stord procedure</h1>
+<table class=" table table-bordered ">
+    <tr>
+        <th>Id</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Password</th>
+        <th>mobileNo</th>
+        <th>village</th>
+        <th>dis</th>
+        <th>State</th>
+        <th>PinCode</th>
+        <th>dname</th>
+        <th>Dcode</th>
+        <th>Edit</th>
+        <th>Dlelete</th> 
+    </tr>
+    @foreach (var item in Model)
+    {
+<tr>
+    <td>@item.Id</td>
+    <td>@item.EName</td>
+    <td>@item.Email</td>
+    <td>@item.Password</td>
+    <td>@item.MobileNo</td>
+    <td>@item.Village</td>
+    <td>@item.Dist</td>
+    <td>@item.State</td>
+    <td>@item.PinCode</td>
+    <td>@item.DName</td>
+    <td>@item.DCode</td>
+    <td><a class="btn btn-danger" href="@Url.Action("UpdatData", "Home", new { @item.Id})">Edit</a> </td>
+    @*<td><a class="btn btn-danger" href="@Url.Action("Edit", "Home", new { @item.Id, @item.EdId })">Edit</a> </td>*@
+    <td><a class="btn btn-danger" href="@Url.Action("Delete","Home",new {@item.Id })">Delete</a> </td>
+</tr>
+    }
+</table>
+
+ 
+=========================================================================
+----------------------> LOGIN
+
+@model Error12.DataBase2.GetDataWithEmail_Result
+@{
+    ViewBag.Title = "Login";
+}
+
+<style>
+    .login {
+        position: center;
+        padding: 50px;
+        margin: 50px;
+        width: 50%;
+        border-style: solid;
+        border-block-color: #00ff21;
+    }
+
+    .text {
+        text-align: center;
+        color: #000000;
+    }
+
+    .error {
+        color: red;
+    }
+</style>
+<marquee><h2 style="color:blue">If you are Alrady registered then Login Here</h2></marquee>
+<center>
+    <div class="login">
+        @using (Html.BeginForm("Login", "Home", FormMethod.Post))
+        {
+
+            <h2>Enter your user Id and Password </h2><br />
+            <div>
+                <label>Email</label><label style="color:red">*</label>
+                @Html.TextBoxFor(m => m.Email, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Email, "", new { @class = "error" })
+                <p class="error">@TempData["InvalidEmail"]</p>
+            </div>
+
+            <div style="padding:10px" class="form-group">
+                <label>Password</label><label style="color:red">*</label>
+                @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                @Html.ValidationMessageFor(m => m.Password, "", new { @class = "error" })
+                <p class="error">@TempData["InvalidPass"]</p>
+
+            </div>
+            <label>
+                <button class="btn btn-primary" type="submit">Login</button>
+                <a href="DataView"> Forget Password  </a>
+            </label>
+
+        }
+    </div>
+</center>
+
+ 
+=========================================================================
+----------------------> DETAILS
+
+@model Error12.Models.EmpModel
+@{
+    ViewBag.Title = "Contact";
+}
+<h2>@ViewBag.Title.</h2>
+<h3>@ViewBag.Message</h3>
+
+@using (Html.BeginForm("UpdateData", "Home", FormMethod.Post))
+{
+    <style>
+        .view{
+           
+        }
+    </style>
+    <div class="form-group">
+        <label>Id &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        @Html.DisplayFor(m => m.Id, new { @class = "view" }) 
+    </div>
+    <div class="form-group">
+        <label>Name &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <label class="text-right">@Html.DisplayFor(m => m.EName, new { @class = "view" })</label>
+    </div>
+    <div class="form-group">
+        <label>Your Email&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <label class="text-right">@Html.DisplayFor(m => m.Email, new { @class = "view" })</label>
+    </div>
+    <div class="form-group">
+        <label>Your mobileNo&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <label class="text-right">@Html.DisplayFor(m => m.MobileNo, new { @class = "view" })</label>
+    </div>
+    <div class="form-group">
+        <label>Your village&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <label class="text-right">@Html.DisplayFor(m => m.Village, new { @class = "view" })</label>
+    </div>
+    <div class="form-group">
+        <label>Your District&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+        <label class="text-right">@Html.DisplayFor(m => m.Dist, new { @class = "view" })</label>
+    </div>
+
+    <button class="btn btn-primary" type="submit">Update</button>
+
+  
+}
+
+@*//<td><a class="btn btn-danger" href="@Url.Action("Delete", "Home", new { @item.Id })">Delete</a> </td>*@
+
+
+<address>
+    One Microsoft Way<br />
+    Redmond, WA 98052-6399<br />
+    <abbr title="Phone">P:</abbr>
+    425.555.0100
+</address>
+
+<address>
+    <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
+    <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
+</address>
+
+=========================================================================
+----------------------> LAYOUT
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - My ASP.NET Application</title>
+    @Styles.Render("~/Content/css")
+    @Scripts.Render("~/bundles/modernizr")
+</head>
+<body style="background-color:#d5fcfa">
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                @Html.ActionLink("Application name", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
+                    <li>@Html.ActionLink("About", "About", "Home")</li>
+                    
+                    <li>@Html.ActionLink("Data", "Dasbord", "Home")</li>
+                    <li>@Html.ActionLink("Login", "Login", "Home")</li>
+                    <li>@Html.ActionLink("Form", "RegistrationForm", "Home")</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="container body-content">
+        @RenderBody()
+        <hr />
+        <footer>
+            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+        </footer>
+    </div>
+
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap")
+    @RenderSection("scripts", required: false)
+</body>
+</html>
+
+
+=======================================================
+------------------------- DATABASE  
+=========================================================================
+
+
+----New Database for MVC App wite stord procedure---------
+Create database Stord_Procedure;
+
+
+
+use Stord_Procedure
+ 
+create table employee(Id int , EName varchar(55),Email varchar(20),Password varchar(15),MobileNo varchar(15),addId int,cId int);
+
+create table address(Id int , Village varchar(55),Dist varchar(20),State varchar(15),PinCode varchar(15),EmpId int); 
+create table Department(Id int, DName varchar(55),DCode varchar(20), EmpId int)
+
+create table company(Id int , CName varchar(55),CAdd varchar(20),Role varchar(15),Salary  int,EmpId int);
+
+--drop table address
+--drop table company
+--drop table employee
+
+select * from employee
+select * from address
+select * from Department
+
+ sp_help Stord_Procedure
+ select * from INFORMATION_SCHEMA.TABLES
+
+insert into employee values(5,'mahes','ma@GMAIL.COM','m@123','885',5,5);
+
+insert into address values(5,' up',' ddfhd',' ap','78485',5);
+
+insert into Department values(5,' mca','jw3443',  5);
+-----------------------------------------------------------
+GetDataFromT
+
+Alter proc GetAllData
+as 
+begin
+select e.Id , e.EName,e.Email,e.Password,e.MobileNo,
+a.Village,a.Dist,a.State,a.PinCode,
+d.DName,d.DCode
+from Employee as e
+inner Join Address as a 
+ON a.EmpId=e.Id
+inner join Department as d 
+ON d.EmpId=e.Id
+End;
+
+-------------------//////////
+Alter proc GetAllDataWithId(@Id int) 
+as 
+begin 
+select e.Id , e.EName,e.Email,e.Password,e.MobileNo,
+a.Village,a.Dist,a.State,a.PinCode,
+d.DName,d.DCode
+from Employee as e
+inner join  address as a On a.EmpId=e.Id
+inner join  Department as d On d.EmpId=e.Id
+where e.Id=@Id 
+End;
+--------------///////////////////////////////
+exec GetAllDataWithId 8
+
+exec GetDataFromT
+exec GetAllData
+
+----------------------------------------------------
+---Insert Value--------
+
+Create proc InsertValuetable(
+@Id int,@Village varchar(55),@Dist varchar(20),
+@State varchar(15),@PinCode varchar(15),@EmpId int,@DName varchar(55),
+@DCode varchar(20),@EName varchar(55),@Email varchar(20),@Password varchar(15),
+@MobileNo varchar(15))
+AS
+Begin
+Insert Into employee values(@Id,@EName,@Email,@Password,@MobileNo,@Id,@Id)
+Insert Into address values(@Id,@Village,@Dist,@State,@PinCode,@id)
+Insert Into Department values(@Id,@DName,@DCode,@Id) 
+END;
+----------------------------------
+---Delete data 
+Create proc DeleteData(@Id int)
+AS
+Begin
+delete from Employee where Id=@Id
+delete from address where Id=@Id
+delete from Department where Id=@Id
+End;
+
+exec DeleteData null
+-----------------------------
+exec InsertValuetable 8,'gfhhd','uguh','up','12334',8,'bbb','222','mhug','rr@gmail.com',
+'rr@34','5567';
+
+--truncate table employee
+--truncate table address
+--truncate table department
+
+--------------------------------------------
+
+---Edit Procedure---
+ alter proc EditItem( 
+@Id int,@Village varchar(55),@Dist varchar(20),
+@State varchar(15),@PinCode varchar(15) ,@DName varchar(55),
+@DCode varchar(20),@EName varchar(55),@Email varchar(20),@Password varchar(15),
+@MobileNo varchar(15))
+AS
+Begin
+Update employee Set EName=@EName,Email=@Email,Password=@Password,MobileNo=@MobileNo where Id=@Id 
+Update address Set  Village=@Village,Dist=@Dist,State=@State,PinCode=@PinCode where Id=@Id 
+Update Department Set  Dname=@DName,DCode=@DCode where Id=@Id 
+END;
+
+-----------------------------
+ EditItem 6,' Varansi','rrrrr','up East','12334', 'mca','222','sandeep','na@gmail.com',
+'na@123','85456855';
+
+exec GetAllData
+
+
+
+
+
+
+create proc GetAllData
+as
+Begin
+select  e.EName,e.Email,a.village,c.CAdd from employee as e inner join address as a ON e.Id=a.eId
+ inner join company as c on e.Id=c.EId
+ End; 
+
+ GetAllData
+
+  ---drop proc GetAllData
+  ------------------------------------
+
+ create table comp(Id int not null primary key, CName varchar(55),CAdd varchar(20),Role varchar(15),Salary int,Did int);
+
+create table De (DId int not null primary key, DName varchar(55),DCode varchar(20))
+drop table comp
+sp_rename De.Id, DId
+
+alter table comp add  constraint fi foreign key (DId) references De(DId);
+
+select * from Comp
+select * from De
+
+insert into comp values (2,'chetu','noida','developer','251',22)
+
+insert into De values (22,'Deploma','d23')
+
+select c.id,c.cname,c.cadd,c.role,d.DName,d.DCode from comp as c inner join De as d on c.Did=d.DId
+
+
+select * from Employee
+
+------------------------------------------------
+alter proc GetDataWithEmail(@Email varchar(25),@Password varchar(15)) 
+as 
+begin 
+select e.Id , e.EName,e.Email,e.Password,e.MobileNo,
+a.Village,a.Dist,a.State,a.PinCode,
+d.DName,d.DCode
+from Employee as e
+inner join  address as a On a.EmpId=e.Id
+inner join  Department as d On d.EmpId=e.Id
+where e.Email=@Email and Password=@Password 
+End;
+
+-------------------------------------------------
+exec GetDataWithEmail 'sss@gmail.com' ,'s@123'
+
+
+
+
+
+
+
+
+
+
+
